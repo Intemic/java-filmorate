@@ -18,16 +18,17 @@ import java.util.*;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
+    // придется сделать public чтобы в тестах можно было оперировать данными
+    public final Map<Long, User> users = new HashMap<>();
 
-    private User checkData(User user, Mode mode) {
+    public User checkData(User user, Mode mode) {
         User returnUser = user;
 
         switch (mode) {
             case UPDATE:
                 if (user.getId() == null) {
                     log.error("ID пользователя не указан");
-                    throw new ValidationException("Отсутствуют данные");
+                    throw new ValidationException("ID пользователя не указан");
                 }
 
                 Optional<User> optionalUser = users.values().stream().filter(usr -> Objects.equals(usr.getId(), user.getId())).findFirst();
@@ -90,14 +91,17 @@ public class UserController {
         oldUser.setEmail(user.getEmail());
         oldUser.setLogin(user.getLogin());
         oldUser.setName(user.getName());
-        if (oldUser.getName().isBlank()) oldUser.setName(user.getLogin());
+        if (oldUser.getName().isBlank()) {
+            log.warn("Не заполнен логин");
+            oldUser.setName(user.getLogin());
+        }
         oldUser.setBirthday(user.getBirthday());
         log.info("Данные пользователя id - {} изменены, новые данные: {}", oldUser.getId(), oldUser);
 
         return oldUser;
     }
 
-    private Long getNextId() {
+    public Long getNextId() {
         long currentId = users.keySet().stream().mapToLong(id -> id).max().orElse(0);
         return ++currentId;
     }

@@ -15,5 +15,5 @@ public class Film {
     @DateTimeFormat(style = "yyyy-MM-dd")
     LocalDate releaseDate;
     @NonNull
-    Long duration;
+    Integer duration;
 }

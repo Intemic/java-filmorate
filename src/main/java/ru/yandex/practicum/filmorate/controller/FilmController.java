@@ -19,13 +19,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<Long, Film> films = new HashMap<>();
+    // придется сделать public чтобы в тестах можно было оперировать данными
+    public final Map<Long, Film> films = new HashMap<>();
 
-    private Film checkData(Film film, Mode mode) {
+    public Film checkData(Film film, Mode mode) {
         Film returnFilm = film;
 
         switch (mode) {
             case UPDATE:
+                if (film.getId() == null) {
+                    log.error("ID фильма не указан");
+                    throw new ValidationException("ID фильма не указан");
+                }
+
                 returnFilm = films.get(film.getId());
 
                 if (returnFilm == null) {
@@ -87,7 +93,7 @@ public class FilmController {
         return oldFilm;
     }
 
-    private Long getNextId() {
+    public Long getNextId() {
         long currentId = films.keySet().stream()
                 .mapToLong(id -> id)
                 .max()
