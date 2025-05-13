@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDate;
 
-/**
- * Film.
- */
-@Getter
-@Setter
+@Data
 public class Film {
     Long id;
+    @NonNull
     String name;
     String description;
-    Instant releaseDate;
-    Duration duration;
+    @NonNull
+    @DateTimeFormat(style = "yyyy-MM-dd")
+    LocalDate releaseDate;
+    @NonNull
+    Long duration;
 }
