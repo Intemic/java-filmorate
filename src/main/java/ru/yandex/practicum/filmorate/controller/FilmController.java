@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class FilmController {
     // придется сделать public чтобы в тестах можно было оперировать данными
     public final Map<Long, Film> films = new HashMap<>();
 
+    // тесты были сделаны ранее реализации задания со *, поэтому остались
     public Film checkData(Film film, Mode mode) {
         Film returnFilm = film;
 
@@ -70,7 +72,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@RequestBody @NonNull Film film) {
+    public Film create(@RequestBody @NonNull @Valid Film film) {
         checkData(film, CREATE);
 
         film.setId(getNextId());
@@ -81,7 +83,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody @NonNull Film film) {
+    public Film update(@RequestBody @NonNull @Valid Film film) {
         Film oldFilm = checkData(film, UPDATE);
 
         oldFilm.setName(film.getName());

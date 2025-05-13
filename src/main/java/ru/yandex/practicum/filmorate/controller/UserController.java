@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class UserController {
     // придется сделать public чтобы в тестах можно было оперировать данными
     public final Map<Long, User> users = new HashMap<>();
 
+    // тесты были сделаны ранее реализации задания со *, поэтому остались
     public User checkData(User user, Mode mode) {
         User returnUser = user;
 
@@ -72,7 +74,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody @NonNull User user) {
+    public User create(@RequestBody @NonNull @Valid User user) {
         checkData(user, CREATE);
 
         if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
@@ -85,7 +87,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@RequestBody @NonNull User user) {
+    public User update(@RequestBody @NonNull @Valid User user) {
         User oldUser = checkData(user, UPDATE);
 
         oldUser.setEmail(user.getEmail());
