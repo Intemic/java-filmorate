@@ -9,16 +9,14 @@ import java.time.LocalDate;
 
 @Data
 public class User {
-    Long id;
-    @NonNull
+    private Long id;
     @Email
     @NotBlank
-    String email;
-    @NonNull
+    private String email;
     @NotBlank
-    String login;
-    String name;
+    private String login;
+    private String name;
     @NonNull
     @DateTimeFormat(style = "yyyy-MM-dd")
-    LocalDate birthday;
+    private LocalDate birthday;
 }

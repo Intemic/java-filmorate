@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody @NonNull @Valid User user) {
+    public User create(@RequestBody @Valid User user) {
         checkData(user, CREATE);
 
         if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
@@ -87,7 +87,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@RequestBody @NonNull @Valid User user) {
+    public User update(@RequestBody @Valid User user) {
         User oldUser = checkData(user, UPDATE);
 
         oldUser.setEmail(user.getEmail());

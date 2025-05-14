@@ -9,15 +9,14 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-    Long id;
-    @NonNull
+    private Long id;
     @NotBlank
-    String name;
+    private String name;
     @Length(min = 1, max = 200)
-    String description;
+    private String description;
     @NonNull
     @DateTimeFormat(style = "yyyy-MM-dd")
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
     @NonNull
-    Integer duration;
+    private Integer duration;
 }

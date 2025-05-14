@@ -74,7 +74,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@RequestBody @NonNull @Valid Film film) {
+    public Film create(@RequestBody @Valid Film film) {
         checkData(film, CREATE);
 
         film.setId(getNextId());
@@ -85,7 +85,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody @NonNull @Valid Film film) {
+    public Film update(@RequestBody @Valid Film film) {
         Film oldFilm = checkData(film, UPDATE);
 
         oldFilm.setName(film.getName());
