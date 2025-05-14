@@ -1,23 +1,24 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 @Data
-public class Film {
+public class User {
     private Long id;
     @NonNull
+    @Email
     @NotBlank
+    private String email;
+    @NonNull
+    @NotBlank
+    private String login;
     private String name;
-    @Length(min = 1, max = 200)
-    private String description;
     @NonNull
     @DateTimeFormat(style = "yyyy-MM-dd")
-    private LocalDate releaseDate;
-    @NonNull
-    private Integer duration;
+    private LocalDate birthday;
 }
