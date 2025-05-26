@@ -5,8 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.yandex.practicum.filmorate.exeptions.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
 import java.time.LocalDate;
 

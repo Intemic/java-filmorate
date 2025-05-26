@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface UserStorage {
-    public User add(User user);
+    public void add(User user);
 
     public User update(User user);
 
@@ -15,4 +15,6 @@ public interface UserStorage {
     public Collection<User> getAll();
 
     public Optional<User> get (Long id);
+
+    public Long getNextId();
 }

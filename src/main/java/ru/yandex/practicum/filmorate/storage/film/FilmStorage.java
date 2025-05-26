@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface FilmStorage {
-    public Film add(Film film);
+    public void add(Film film);
 
     public Film update(Film film);
 
@@ -15,4 +15,6 @@ public interface FilmStorage {
     public Collection<Film> getAll();
 
     public Optional<Film> get (Long id);
+
+    public Long getNextId();
 }
