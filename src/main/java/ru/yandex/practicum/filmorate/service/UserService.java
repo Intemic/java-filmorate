@@ -9,8 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -48,21 +47,49 @@ public class UserService {
     public User getUser(Long id) {
         Optional<User> optionalUser = userStorage.get(id);
         if (optionalUser.isEmpty())
-            throw new NotFoundResource("Пользователь не найден");
+            throw new NotFoundResource(String.format("Не найден пользователь с id - %d", id));
 
         return optionalUser.get();
     }
 
     public User addFriend(Long userId, Long friendId) {
-        Optional<User> userOptional = userStorage.get(userId);
-        if (userOptional.isEmpty())
-            throw new NotFoundResource(String.format("Не найден пользователь с id - %d", userId));
+        User user = getUser(userId);
+        User friend = getUser(userId);
 
-        Optional<User> friendOptional = userStorage.get(friendId);
-        if (friendOptional.isEmpty())
-            throw new NotFoundResource(String.format("Не найден друг с id - %d", friendId));
+        Set<Long> friends = user.getFriends();
+        friends.add(friendId);
+        user.setFriends(friends);
+        return userStorage.update(user);
+    }
 
+    public void deleteFriend(Long userId, Long friendId) {
+        User user = getUser(userId);
+        User friend = getUser(userId);
 
-        return null;
+        Set<Long> friends = user.getFriends();
+        friends.remove(friendId);
+        user.setFriends(friends);
+        userStorage.update(user);
+    }
+
+    public List<User> getFriends(Long id) {
+        User user = getUser(id);
+        return user.getFriends().stream()
+                . filter(userId -> userStorage.get(userId).isPresent())
+                .map( userId ->  (userStorage.get(userId)).get())
+                .toList();
+    }
+
+    public List<User> getMutualFriends(Long id, Long othersId) {
+        User user = getUser(id);
+        User otherUser = getUser(id);
+
+        Set<Long> intersection = new HashSet<>(user.getFriends());
+        intersection.retainAll(otherUser.getFriends());
+
+        return intersection.stream()
+                . filter(userId -> userStorage.get(userId).isPresent())
+                .map( userId ->  (userStorage.get(userId)).get())
+                .toList();
     }
 }

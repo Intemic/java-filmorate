@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Data
@@ -24,6 +26,7 @@ public class User {
     @NonNull
     @DateTimeFormat(style = "yyyy-MM-dd")
     private LocalDate birthday;
+    private Set<Long> friends = new HashSet();
 
     public void checkCorrectData() {
         if (id == null) {
