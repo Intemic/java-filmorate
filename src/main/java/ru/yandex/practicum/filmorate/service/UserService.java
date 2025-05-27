@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.utill.Operation;
+import static ru.yandex.practicum.filmorate.utill.Operation.ADD;
+import static ru.yandex.practicum.filmorate.utill.Operation.DELETE;
 
 import java.util.*;
 
@@ -32,10 +33,7 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (userStorage.get(user.getId()).isEmpty()) {
-            log.error("Пользователь не найден");
-            throw new ValidationException("Пользователь не найден");
-        }
+        User oldUser = getUser(user.getId());
 
         user.checkCorrectData();
         User updateUser = userStorage.update(user);
@@ -46,30 +44,42 @@ public class UserService {
 
     public User getUser(Long id) {
         Optional<User> optionalUser = userStorage.get(id);
-        if (optionalUser.isEmpty())
+        if (optionalUser.isEmpty()) {
+            log.error(String.format("Не найден пользователь с id - %d", id));
             throw new NotFoundResource(String.format("Не найден пользователь с id - %d", id));
+        }
 
         return optionalUser.get();
     }
 
+    private User changeUserFriend(User user, User userFriend, Operation operation) {
+        Set<Long> listFriends = user.getFriends();
+        switch (operation) {
+            case ADD:
+                listFriends.add(userFriend.getId());
+                break;
+            case DELETE:
+                listFriends.remove(userFriend.getId());
+                break;
+        }
+        user.setFriends(listFriends);
+        return  userStorage.update(user);
+    }
+
     public User addFriend(Long userId, Long friendId) {
         User user = getUser(userId);
-        User friend = getUser(userId);
+        User friendUser = getUser(friendId);
 
-        Set<Long> friends = user.getFriends();
-        friends.add(friendId);
-        user.setFriends(friends);
-        return userStorage.update(user);
+        changeUserFriend(friendUser, user, ADD);
+        return changeUserFriend(user, friendUser, ADD);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
         User user = getUser(userId);
-        User friend = getUser(userId);
+        User friendUser = getUser(friendId);
 
-        Set<Long> friends = user.getFriends();
-        friends.remove(friendId);
-        user.setFriends(friends);
-        userStorage.update(user);
+        changeUserFriend(friendUser, user, DELETE);
+        changeUserFriend(user, friendUser, DELETE);
     }
 
     public List<User> getFriends(Long id) {
@@ -82,7 +92,7 @@ public class UserService {
 
     public List<User> getMutualFriends(Long id, Long othersId) {
         User user = getUser(id);
-        User otherUser = getUser(id);
+        User otherUser = getUser(othersId);
 
         Set<Long> intersection = new HashSet<>(user.getFriends());
         intersection.retainAll(otherUser.getFriends());

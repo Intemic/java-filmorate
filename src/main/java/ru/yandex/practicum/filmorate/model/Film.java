@@ -18,7 +18,6 @@ public class Film {
     @NonNull
     @NotBlank
     private String name;
-    @Length(min = 1, max = 200)
     private String description;
     @NonNull
     @DateTimeFormat(style = "yyyy-MM-dd")

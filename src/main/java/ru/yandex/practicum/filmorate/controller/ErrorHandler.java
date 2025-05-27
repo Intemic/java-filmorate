@@ -9,8 +9,15 @@ import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler({NotFoundResource.class, ValidationException.class})
-    public ErrorResponse handleNotFoundResource(RuntimeException e) {
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFoundResource(NotFoundResource e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationException(ValidationException e) {
         return new ErrorResponse(e.getMessage());
     }
 

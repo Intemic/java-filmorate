@@ -50,14 +50,14 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public void likeTheMove(@PathVariable("id") Long filmId,
                             @PathVariable("userId") Long userId) {
         filmService.likeTheMove(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public void deleteLikeTheMove(@PathVariable("id") Long filmId,
                                   @PathVariable("userId") Long userId) {
         filmService.deleteLikeTheMove(filmId, userId);
