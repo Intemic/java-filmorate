@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Data
@@ -23,6 +25,7 @@ public class Film {
     private LocalDate releaseDate;
     @NonNull
     private Integer duration;
+    private Set<Long> userLiked = new HashSet<>();
 
     public void checkCorrectData() {
         if (id == null) {

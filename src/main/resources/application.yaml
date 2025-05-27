@@ -1,0 +1,5 @@
+filmorate:
+  film:
+    popular:
+      show:
+        count: 10
