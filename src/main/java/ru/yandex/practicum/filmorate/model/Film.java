@@ -10,7 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class Film {
     private Long id;
     private String name;
@@ -21,6 +24,12 @@ public class Film {
     @NonNull
     private Integer duration;
     private Set<Long> userLiked = new HashSet<>();
+
+    public Film(String name, LocalDate releaseDate, Integer duration) {
+        this.name = name;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 
     public void checkCorrectData() {
         if (id == null) {
