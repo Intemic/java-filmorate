@@ -14,8 +14,6 @@ import java.util.Set;
 @Data
 public class Film {
     private Long id;
-    @NonNull
-    @NotBlank
     private String name;
     private String description;
     @NonNull
