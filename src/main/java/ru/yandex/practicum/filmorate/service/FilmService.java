@@ -84,18 +84,12 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int showCount) {
         Comparator<Film> comparatorFilm = (film1, film2) -> {
-            if (film2.getUserLiked().size() > film1.getUserLiked().size())
-                return 1;
-            else if (film2.getUserLiked().size() < film1.getUserLiked().size())
-                return -1;
-
-            return 0;
+           return Long.compare(film2.getUserLiked().size(), film1.getUserLiked().size());
         };
 
-        int skip = filmStorage.getAll().size() - (showCount + 1);
         return filmStorage.getAll().stream()
                 .sorted(comparatorFilm)
-                .skip(skip > 0 ? skip : 0)
+                .skip(Math.max(filmStorage.getAll().size() - (showCount + 1), 0))
                 .toList();
     }
 }
