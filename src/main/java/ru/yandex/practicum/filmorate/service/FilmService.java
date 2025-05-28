@@ -7,6 +7,10 @@ import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.utill.Operation;
+
+import static ru.yandex.practicum.filmorate.utill.Operation.ADD;
+import static ru.yandex.practicum.filmorate.utill.Operation.DELETE;
 
 import java.util.*;
 
@@ -50,33 +54,39 @@ public class FilmService {
         return optionalFilm.get();
     }
 
+    private void changeLikeTheMove(Film film, User user, Operation operation) {
+        Set<Long> userLiked = film.getUserLiked();
+        switch (operation) {
+            case ADD:
+                userLiked.add(user.getId());
+                break;
+            case DELETE:
+                userLiked.remove(user.getId());
+                break;
+        }
+        film.setUserLiked(userLiked);
+        filmStorage.update(film);
+    }
+
     public void likeTheMove(Long filmId, Long userId) {
         User user = userService.getUser(userId);
         Film film = getFilm(filmId);
 
-        Set<Long> userLiked = film.getUserLiked();
-        userLiked.add(user.getId());
-        film.setUserLiked(userLiked);
-
-        filmStorage.update(film);
+        changeLikeTheMove(film, user, ADD);
     }
 
     public void deleteLikeTheMove(Long filmId, Long userId) {
         User user = userService.getUser(userId);
         Film film = getFilm(filmId);
 
-        Set<Long> userLiked = film.getUserLiked();
-        userLiked.remove(user.getId());
-        film.setUserLiked(userLiked);
-
-        filmStorage.update(film);
+        changeLikeTheMove(film, user, DELETE);
     }
 
     public List<Film> getPopularFilms(int showCount) {
-        Comparator<Film> comparatorFilm = (film1, film2 ) -> {
+        Comparator<Film> comparatorFilm = (film1, film2) -> {
             if (film2.getUserLiked().size() > film1.getUserLiked().size())
                 return 1;
-            else if( film2.getUserLiked().size() < film1.getUserLiked().size())
+            else if (film2.getUserLiked().size() < film1.getUserLiked().size())
                 return -1;
 
             return 0;
@@ -85,7 +95,7 @@ public class FilmService {
         int skip = filmStorage.getAll().size() - (showCount + 1);
         return filmStorage.getAll().stream()
                 .sorted(comparatorFilm)
-                .skip ( skip > 0 ? skip : 0 )
+                .skip(skip > 0 ? skip : 0)
                 .toList();
     }
 }

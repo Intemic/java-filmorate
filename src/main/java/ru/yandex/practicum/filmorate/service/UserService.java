@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utill.Operation;
+
 import static ru.yandex.practicum.filmorate.utill.Operation.ADD;
 import static ru.yandex.practicum.filmorate.utill.Operation.DELETE;
 
@@ -63,7 +64,7 @@ public class UserService {
                 break;
         }
         user.setFriends(listFriends);
-        return  userStorage.update(user);
+        return userStorage.update(user);
     }
 
     public User addFriend(Long userId, Long friendId) {
@@ -85,8 +86,8 @@ public class UserService {
     public List<User> getFriends(Long id) {
         User user = getUser(id);
         return user.getFriends().stream()
-                . filter(userId -> userStorage.get(userId).isPresent())
-                .map( userId ->  (userStorage.get(userId)).get())
+                .filter(userId -> userStorage.get(userId).isPresent())
+                .map(userId -> (userStorage.get(userId)).get())
                 .toList();
     }
 
@@ -98,8 +99,8 @@ public class UserService {
         intersection.retainAll(otherUser.getFriends());
 
         return intersection.stream()
-                . filter(userId -> userStorage.get(userId).isPresent())
-                .map( userId ->  (userStorage.get(userId)).get())
+                .filter(userId -> userStorage.get(userId).isPresent())
+                .map(userId -> (userStorage.get(userId)).get())
                 .toList();
     }
 }
