@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
-@Component
+@Component("MemoryFilm")
 public class InMemoryFilmStorage implements FilmStorage {
     public final Map<Long, Film> films = new HashMap<>();
 
     @Override
-    public void add(Film film) {
+    public Film create(Film film) {
         films.put(film.getId(), film);
+        return film;
     }
 
     @Override
@@ -55,4 +55,6 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .filter(film -> film.getId().equals(id))
                 .findFirst();
     }
+
+
 }

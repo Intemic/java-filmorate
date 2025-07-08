@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -19,12 +22,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<User> get() {
+    public Collection<UserDTO> get() {
         return userService.getAll();
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable @Positive Long id) {
+    public UserDTO getUser(@PathVariable @Positive Long id) {
         return userService.getUser(id);
     }
 
@@ -41,19 +44,19 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@RequestBody @Valid User user) {
+    public UserDTO create(@RequestBody @Valid NewUserRequest user) {
         return userService.create(user);
     }
 
     @PutMapping
-    public User update(@RequestBody @Valid User user) {
+    public UserDTO update(@RequestBody @Valid UpdateUserRequest user) {
         return userService.update(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable("id") @Positive Long userId,
+    public void addFriend(@PathVariable("id") @Positive Long userId,
                           @PathVariable("friendId") @Positive Long friendId) {
-        return userService.addFriend(userId, friendId);
+        userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
