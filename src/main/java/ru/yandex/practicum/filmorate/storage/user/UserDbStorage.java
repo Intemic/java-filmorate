@@ -25,12 +25,12 @@ public class UserDbStorage extends BaseDbChangedStore<User> implements UserStora
 
     @Override
     public User create(User user) {
-        long user_id = insert(INSERT_QUERY,
+        long id = insert(INSERT_QUERY,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday());
-        user.setId(user_id);
+        user.setId(id);
         return user;
     }
 
