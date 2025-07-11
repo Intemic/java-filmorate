@@ -45,7 +45,6 @@ public class FilmDbStorage extends BaseDbChangedStore<Film> implements FilmStora
         return film;
     }
 
-
     @Override
     public Film update(Film film) {
         update(
