@@ -1,10 +1,16 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
+import ru.yandex.practicum.filmorate.mappers.UserMapper;
+import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.frend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utill.Operation;
 
@@ -12,79 +18,91 @@ import static ru.yandex.practicum.filmorate.utill.Operation.ADD;
 import static ru.yandex.practicum.filmorate.utill.Operation.DELETE;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
-    public Collection<User> getAll() {
-        return userStorage.getAll();
+    public UserService(@Qualifier("DBUser") UserStorage userStorage,
+                       FriendStorage friendStorage) {
+        this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
     }
 
-    public User create(User user) {
-        if (user.getName() == null || user.getName().isBlank())
-            user.setName(user.getLogin());
-        user.setId(userStorage.getNextId());
-        user.checkCorrectData();
-        userStorage.add(user);
-        log.info("Создан новый пользователь, id - {}", user.getId());
-        return user;
+    public Collection<UserDTO> getAll() {
+        return userStorage.getAll().stream()
+                .map(UserMapper::mapToFilmDTO)
+                .collect(Collectors.toList());
     }
 
-    public User update(User user) {
-        User oldUser = getUser(user.getId());
+    public User getOneUser(Long id) {
+        User user;
 
-        user.checkCorrectData();
-        User updateUser = userStorage.update(user);
-        log.info("Данные пользователя id - {} изменены", user.getId());
-
-        return updateUser;
-    }
-
-    public User getUser(Long id) {
         Optional<User> optionalUser = userStorage.get(id);
         if (optionalUser.isEmpty()) {
             log.error(String.format("Не найден пользователь с id - %d", id));
             throw new NotFoundResource(String.format("Не найден пользователь с id - %d", id));
         }
 
-        return optionalUser.get();
+        user = optionalUser.get();
+
+        Optional<Friend> friendOptional = friendStorage.getFriends(id);
+        friendOptional.ifPresent(friend -> user.setFriends(friend.getFriends()));
+        return user;
     }
 
-    private User changeUserFriend(User user, User userFriend, Operation operation) {
-        Set<Long> listFriends = user.getFriends();
+    public UserDTO create(NewUserRequest userRequest) {
+        userRequest.checkCorrectData();
+        if (userRequest.getName() == null || userRequest.getName().isBlank())
+            userRequest.setName(userRequest.getLogin());
+        User user = userStorage.create(UserMapper.mapToUser(userRequest));
+        log.info("Создан новый пользователь, id - {}", user.getId());
+        return UserMapper.mapToFilmDTO(user);
+    }
+
+
+    public UserDTO update(UpdateUserRequest userRequest) {
+        userRequest.checkCorrectData();
+        User oldUser = getOneUser(userRequest.getId());
+        User updateUser = userStorage.update(UserMapper.updateUserFields(oldUser, userRequest));
+        log.info("Данные пользователя id - {} изменены", updateUser.getId());
+
+        return UserMapper.mapToFilmDTO(updateUser);
+    }
+
+    public UserDTO getUser(Long id) {
+        return UserMapper.mapToFilmDTO(getOneUser(id));
+    }
+
+    private void changeUserFriend(Long userId, Long friendId, Operation operation) {
+        User user = getOneUser(userId);
+        User friendUser = getOneUser(friendId);
+
         switch (operation) {
             case ADD:
-                listFriends.add(userFriend.getId());
+                Set<Long> listFriends = user.getFriends();
+                if (!listFriends.contains(friendId))
+                    friendStorage.addFriend(userId, friendId);
                 break;
             case DELETE:
-                listFriends.remove(userFriend.getId());
+                friendStorage.deleteFriend(userId, friendId);
                 break;
         }
-        user.setFriends(listFriends);
-        return userStorage.update(user);
     }
 
-    public User addFriend(Long userId, Long friendId) {
-        User user = getUser(userId);
-        User friendUser = getUser(friendId);
-
-        changeUserFriend(friendUser, user, ADD);
-        return changeUserFriend(user, friendUser, ADD);
+    public void addFriend(Long userId, Long friendId) {
+        changeUserFriend(userId, friendId, ADD);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        User user = getUser(userId);
-        User friendUser = getUser(friendId);
-
-        changeUserFriend(friendUser, user, DELETE);
-        changeUserFriend(user, friendUser, DELETE);
+        changeUserFriend(userId, friendId, DELETE);
     }
 
     public List<User> getFriends(Long id) {
-        User user = getUser(id);
+        User user = getOneUser(id);
         return user.getFriends().stream()
                 .filter(userId -> userStorage.get(userId).isPresent())
                 .map(userId -> (userStorage.get(userId)).get())
@@ -92,8 +110,8 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(Long id, Long othersId) {
-        User user = getUser(id);
-        User otherUser = getUser(othersId);
+        User user = getOneUser(id);
+        User otherUser = getOneUser(othersId);
 
         Set<Long> intersection = new HashSet<>(user.getFriends());
         intersection.retainAll(otherUser.getFriends());
