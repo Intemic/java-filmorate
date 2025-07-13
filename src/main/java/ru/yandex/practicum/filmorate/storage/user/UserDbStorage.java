@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository("DBUser")
@@ -51,7 +51,7 @@ public class UserDbStorage extends BaseDbChangedStore<User> implements UserStora
     }
 
     @Override
-    public Collection<User> getAll() {
+    public List<User> getAll() {
         return getMany(FIND_ALL_QUERY);
     }
 
@@ -60,8 +60,4 @@ public class UserDbStorage extends BaseDbChangedStore<User> implements UserStora
         return getSingle(FIND_ONE_QUERY, id);
     }
 
-    @Override
-    public Long getNextId() {
-        return 0L;
-    }
 }

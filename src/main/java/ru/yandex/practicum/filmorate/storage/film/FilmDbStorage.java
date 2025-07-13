@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
 
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository("DBFilm")
@@ -16,10 +16,10 @@ public class FilmDbStorage extends BaseDbChangedStore<Film> implements FilmStora
     private static final String FIND_ALL_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
             "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
             "ON f.mpa_id = m.id";
-
     private static final String FIND_BY_ID_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
             "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
             "ON f.mpa_id = m.id WHERE f.id = ?";
+
     private static final String INSERT_QUERY =
             "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
                     "VALUES (?, ?, ?, ?, ?)";
@@ -66,18 +66,13 @@ public class FilmDbStorage extends BaseDbChangedStore<Film> implements FilmStora
     }
 
     @Override
-    public Collection<Film> getAll() {
+    public List<Film> getAll() {
         return getMany(FIND_ALL_QUERY);
     }
 
     @Override
     public Optional<Film> get(Long id) {
         return getSingle(FIND_BY_ID_QUERY, id);
-    }
-
-    @Override
-    public Long getNextId() {
-        return 0L;
     }
 
 

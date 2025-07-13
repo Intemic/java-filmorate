@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<UserDTO> get() {
+    public List<UserDTO> get() {
         return userService.getAll();
     }
 

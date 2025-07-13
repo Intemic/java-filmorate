@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
+import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Like;
@@ -49,19 +50,14 @@ public class FilmService {
         this.likeDbStorage = likeDbStorage;
     }
 
-    private Collection<Film> getAllFilms() {
-        Collection<Film> films = filmStorage.getAll();
-        films.forEach(film -> {
-            Collection<Genre> genres = genreStorage.getGenresForFilm(film);
-            if (!genres.isEmpty())
-                film.setGenres(new HashSet<>(genres));
-            Optional<Like> like = likeDbStorage.getUsersLiked(film.getId());
-            like.ifPresent(value -> film.setUserLiked(value.getUsers()));
-        });
+    private List<Film> getAllFilms() {
+        List<Film> films = filmStorage.getAll();
+        genreStorage.fillGenresForFilms(films);
+        likeDbStorage.fillLikedForFilms(films);
         return films;
     }
 
-    public Collection<FilmDTO> getAll() {
+    public List<FilmDTO> getAll() {
         return getAllFilms().stream()
                 .map(FilmMapper::mapToFilmDTO)
                 .collect(Collectors.toList());
@@ -154,8 +150,9 @@ public class FilmService {
     }
 
     private void checkExistGenres(Collection<GenreShort> genres) {
+        Collection<Genre> genreAll = genreStorage.getAll();
         genres.forEach(genreShort -> {
-            if (genreStorage.get(genreShort.getId()).isEmpty())
+            if (!genreAll.contains(GenreMapper.mapToGenre(genreShort)))
                 throw new NotFoundResource("Жанр - " + genreShort.getId() + " отсутствует");
         });
     }

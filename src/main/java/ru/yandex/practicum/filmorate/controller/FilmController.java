@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.Collection;
 import java.util.List;
 
 @Validated
@@ -24,7 +23,7 @@ public class FilmController {
     private final AppConfig appConfig;
 
     @GetMapping
-    public Collection<FilmDTO> getAll() {
+    public List<FilmDTO> getAll() {
         return filmService.getAll();
     }
 

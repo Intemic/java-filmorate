@@ -1,16 +1,16 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface BaseStorage<T> {
-    public T create(T object);
+    T create(T object);
 
-    public T update(T object);
+    T update(T object);
 
-    public void delete(Long id);
+    void delete(Long id);
 
-    public Collection<T> getAll();
+    List<T> getAll();
 
-    public Optional<T> get(Long id);
+    Optional<T> get(Long id);
 }

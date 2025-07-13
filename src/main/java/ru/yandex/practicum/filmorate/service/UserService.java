@@ -32,7 +32,7 @@ public class UserService {
         this.friendStorage = friendStorage;
     }
 
-    public Collection<UserDTO> getAll() {
+    public List<UserDTO> getAll() {
         return userStorage.getAll().stream()
                 .map(UserMapper::mapToFilmDTO)
                 .collect(Collectors.toList());

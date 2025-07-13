@@ -4,5 +4,4 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
 
 public interface UserStorage extends BaseStorage<User> {
-    Long getNextId();
 }
