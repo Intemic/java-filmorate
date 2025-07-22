@@ -4,12 +4,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Friend;
-import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
+import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 
 import java.util.Optional;
 
 @Repository
-public class FriendDbStorage extends BaseDbChangedStore<Friend> implements FriendStorage {
+public class FriendDbStorage extends BaseDbStorage<Friend> implements FriendStorage {
     private static final String FIND_ALL_FRIENDS = "SELECT * FROM users_friends WHERE user_id = ?";
     private static final String INSERT_FRIEND = "INSERT INTO users_friends (user_id, friend_id) " +
             "VALUES(?, ?)";

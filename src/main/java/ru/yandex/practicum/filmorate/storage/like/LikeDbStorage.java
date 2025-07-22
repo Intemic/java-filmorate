@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Like;
-import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
+import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class LikeDbStorage extends BaseDbChangedStore<Like> implements LikeStorage {
+public class LikeDbStorage extends BaseDbStorage<Like> implements LikeStorage {
     private static final String FIND_LIKES_FOR_FILM = "SELECT * FROM films_liked WHERE film_id = ?";
     private static final String FIND_LIKES_FOR_ALL_FILMS = "SELECT * FROM films_liked WHERE film_id IN (%s)";
     private static final String DELETE_LIKE_FOR_FILM = "DELETE FROM films_liked WHERE film_id = ? AND user_id = ?";

@@ -4,7 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
+import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository("DBFilm")
-public class FilmDbStorage extends BaseDbChangedStore<Film> implements FilmStorage {
+public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_ALL_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
             "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
             "ON f.mpa_id = m.id";

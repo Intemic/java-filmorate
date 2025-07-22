@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
+import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class GenreDbStorage extends BaseDbChangedStore<Genre> implements GenreStorage {
+public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = ?";
     private static final String FIND_ALL_FILM_GENRES = "SELECT g.id, g.name FROM FILMS_GENRE AS fg " +

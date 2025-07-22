@@ -4,13 +4,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.BaseDbChangedStore;
+import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository("DBUser")
-public class UserDbStorage extends BaseDbChangedStore<User> implements UserStorage {
+public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String INSERT_QUERY = "INSERT INTO users (email, login, name, birthday) " +
             "VALUES(?, ?, ?, ?)";
