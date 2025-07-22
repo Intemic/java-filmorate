@@ -27,6 +27,7 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
     public ErrorResponse handleAnnotationValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
