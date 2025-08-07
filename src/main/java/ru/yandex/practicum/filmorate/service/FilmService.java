@@ -51,8 +51,8 @@ public class FilmService {
 
     private List<Film> getAllFilms() {
         List<Film> films = filmStorage.getAll();
-        genreStorage.fillGenresForFilms(films);
-        likeDbStorage.fillLikedForFilms(films);
+//        genreStorage.fillGenresForFilms(films);
+//        likeDbStorage.fillLikedForFilms(films);
         return films;
     }
 
@@ -99,8 +99,8 @@ public class FilmService {
             throw new NotFoundResource("Фильм не найден");
 
         Film film = optionalFilm.get();
-        genreStorage.fillGenresForFilms(List.of(film));
-        likeDbStorage.fillLikedForFilms(List.of(film));
+        //genreStorage.fillGenresForFilms(List.of(film));
+        //likeDbStorage.fillLikedForFilms(List.of(film));
         return film;
     }
 

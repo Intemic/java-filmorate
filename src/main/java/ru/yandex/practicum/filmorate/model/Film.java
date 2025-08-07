@@ -8,11 +8,12 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Slf4j
+@Builder
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString
+@AllArgsConstructor
 public class Film {
     private Long id;
     private String name;

@@ -31,9 +31,12 @@ public class FilmMapper {
         film.setReleaseDate(filmRequest.getReleaseDate());
         film.setDuration(filmRequest.getDuration());
         if (filmRequest.getMpa() != null) {
-            Mpa mpa = new Mpa();
-            mpa.setId(filmRequest.getMpa().getId());
-            film.setMpa(mpa);
+//            Mpa mpa = new Mpa();
+//            mpa.setId(filmRequest.getMpa().getId());
+//            film.setMpa(mpa);
+            film.setMpa(Mpa.builder()
+                    .id(filmRequest.getMpa().getId())
+                    .build());
         }
         if (!filmRequest.getGenres().isEmpty())
             film.setGenres(new HashSet<Genre>(filmRequest.getGenres().stream()
@@ -56,9 +59,12 @@ public class FilmMapper {
             film.setDuration(updateFilm.getDuration());
 
         if (updateFilm.hasMpa()) {
-            Mpa mpa = new Mpa();
-            mpa.setId(updateFilm.getMpa().getId());
-            film.setMpa(mpa);
+//            Mpa mpa = new Mpa();
+//            mpa.setId(updateFilm.getMpa().getId());
+//            film.setMpa(mpa);
+            film.setMpa(Mpa.builder()
+                    .id(updateFilm.getMpa().getId())
+                    .build());
         }
 
         if (updateFilm.hasGenres())

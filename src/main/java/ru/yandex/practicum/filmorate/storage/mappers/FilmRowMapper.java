@@ -20,10 +20,14 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setDuration(rs.getInt("duration"));
         long mid = rs.getLong("mpa_id");
         if (mid != 0) {
-            Mpa mpa = new Mpa();
-            mpa.setId(mid);
-            mpa.setName(rs.getString("mpa_name"));
-            film.setMpa(mpa);
+//            Mpa mpa = new Mpa();
+//            mpa.setId(mid);
+//            mpa.setName(rs.getString("mpa_name"));
+//            film.setMpa(mpa);
+            film.setMpa(Mpa.builder()
+                    .id(mid)
+                    .name(rs.getString("mpa_name"))
+                    .build());
         }
         return film;
     }
