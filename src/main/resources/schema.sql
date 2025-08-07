@@ -50,4 +50,23 @@
     FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
   );
 
+CREATE TABLE IF NOT EXISTS reviews (
+    id IDENTITY NOT NULL PRIMARY KEY,
+    film_id BIGINT,
+    user_id BIGINT,
+    content VARCHAR,
+    positiv BOOLEAN,
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT unique_keys_reviews UNIQUE(film_id, user_id)
+);
 
+CREATE TABLE IF NOT EXISTS reviews_likes (
+    id IDENTITY NOT NULL PRIMARY KEY,
+    review_id BIGINT,
+    user_id BIGINT,
+    like_value INTEGER,
+    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT unique_keys_reviews_likes UNIQUE(review_id, user_id)
+);

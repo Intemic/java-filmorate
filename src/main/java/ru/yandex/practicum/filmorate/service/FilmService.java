@@ -100,12 +100,8 @@ public class FilmService {
             throw new NotFoundResource("Фильм не найден");
 
         Film film = optionalFilm.get();
-        Collection<Genre> genres = genreStorage.getGenresForFilm(film);
-        if (!genres.isEmpty())
-            film.setGenres(new HashSet<>(genres));
-        Optional<Like> like = likeDbStorage.getUsersLiked(film.getId());
-        like.ifPresent(value -> film.setUserLiked(value.getUsers()));
-
+        genreStorage.fillGenresForFilms(List.of(film));
+        likeDbStorage.fillLikedForFilms(List.of(film));
         return film;
     }
 
@@ -160,5 +156,15 @@ public class FilmService {
     private void checkExistMpa(MpaShort mpa) {
         if (mpa != null && mpaStorage.get(mpa.getId()).isEmpty())
             throw new NotFoundResource("MPA - " + mpa.getId() + " отсутствует");
+    }
+
+    public List<FilmDTO> search(String query, String by) {
+        List<Film> films = filmStorage.searchFilms(query, by);
+        genreStorage.fillGenresForFilms(films);
+        likeDbStorage.fillLikedForFilms(films);
+        return films.stream()
+                .sorted((film1, film2) -> (film2.getUserLiked().size() - film1.getUserLiked().size()))
+                .map(film -> FilmMapper.mapToFilmDTO(film))
+                .toList();
     }
 }

@@ -10,16 +10,31 @@ import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository("DBFilm")
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
-    private static final String FIND_ALL_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
+    private static final String DIRECTOR = "director";
+    private static final String TITLE = "title";
+    private static final String SEARCH_TEMPLATE = "%s ILIKE '%%%s%%'";
+    private static final String FIND_ALL_QUERY = "SELECT f.id," +
+            "f.name, " +
+            "f.description, " +
+            "f.release_date, " +
+            "f.duration, " +
+            "f.mpa_id, " +
+            "m.name AS mpa_name " +
+            "FROM FILMS AS f LEFT JOIN MPA AS m " +
             "ON f.mpa_id = m.id";
-    private static final String FIND_BY_ID_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
+    private static final String FIND_BY_ID_QUERY = "SELECT f.id, " +
+            "f.name, " +
+            "f.description, " +
+            "f.release_date, " +
+            "f.duration, " +
+            "f.mpa_id, " +
+            "m.name AS mpa_name " +
+            "FROM FILMS AS f LEFT JOIN MPA AS m " +
             "ON f.mpa_id = m.id WHERE f.id = ?";
-
     private static final String INSERT_QUERY =
             "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
                     "VALUES (?, ?, ?, ?, ?)";
@@ -76,4 +91,23 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
 
-}
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        StringBuilder sqlQuery = new StringBuilder();
+        Set<String> params = Set.of(by.split(","));
+
+        if (params.contains(DIRECTOR))
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("d.director_name", query));
+        if (params.contains(TITLE)) {
+            if (!sqlQuery.isEmpty())
+                sqlQuery.append(" OR ");
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("f.film_name", query));
+        }
+
+        if (sqlQuery.isEmpty())
+            return List.of();
+
+        sqlQuery.insert(0, " WHERE ");
+        sqlQuery.insert(0, FIND_ALL_QUERY);
+        return jdbc.query(sqlQuery.toString(), mapper);
+    }}

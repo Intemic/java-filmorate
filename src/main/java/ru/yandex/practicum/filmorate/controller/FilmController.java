@@ -40,6 +40,12 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
+    @GetMapping("/search")
+    public List<FilmDTO> search(@RequestParam String query,
+                                @RequestParam String by) {
+        return filmService.search(query, by);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public FilmDTO create(@RequestBody @Valid NewFilmRequest film) {
@@ -64,5 +70,7 @@ public class FilmController {
                                   @PathVariable("userId") @Positive Long userId) {
         filmService.deleteLikeTheMove(filmId, userId);
     }
+
+
 
 }
