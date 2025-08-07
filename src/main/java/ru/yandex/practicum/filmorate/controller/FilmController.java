@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.config.AppConfig;
+import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -48,12 +48,12 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FilmDTO create(@RequestBody @Valid NewFilmRequest film) {
+    public FilmDTO create(@RequestBody @Valid FilmCreate film) {
         return filmService.create(film);
     }
 
     @PutMapping
-    public FilmDTO update(@RequestBody @Valid UpdateFilmRequest filmRequest) {
+    public FilmDTO update(@RequestBody @Valid FilmUpdate filmRequest) {
         return filmService.update(filmRequest);
     }
 

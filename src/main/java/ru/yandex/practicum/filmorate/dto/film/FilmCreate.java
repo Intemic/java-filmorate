@@ -17,7 +17,7 @@ import java.util.Set;
 
 @Slf4j
 @Data
-public class NewFilmRequest {
+public class FilmCreate {
     @NotBlank
     private String name;
     @NotBlank

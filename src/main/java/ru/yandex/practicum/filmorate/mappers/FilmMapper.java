@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.mappers;
 
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
+import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -24,7 +24,7 @@ public class FilmMapper {
         return filmDTO;
     }
 
-    public static Film mapToFilm(NewFilmRequest filmRequest) {
+    public static Film mapToFilm(FilmCreate filmRequest) {
         Film film = new Film();
         film.setName(filmRequest.getName());
         film.setDescription(filmRequest.getDescription());
@@ -42,7 +42,7 @@ public class FilmMapper {
         return film;
     }
 
-    public static Film updateFilmFields(Film film, UpdateFilmRequest updateFilm) {
+    public static Film updateFilmFields(Film film, FilmUpdate updateFilm) {
         if (updateFilm.hasName())
             film.setName(updateFilm.getName());
 

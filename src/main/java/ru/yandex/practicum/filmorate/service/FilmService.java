@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
 import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -63,7 +62,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public FilmDTO create(NewFilmRequest filmRequest) {
+    public FilmDTO create(FilmCreate filmRequest) {
         // проверки
         filmRequest.checkCorrectData();
         checkExistMpa(filmRequest.getMpa());
@@ -76,7 +75,7 @@ public class FilmService {
         return FilmMapper.mapToFilmDTO(film);
     }
 
-    public FilmDTO update(UpdateFilmRequest filmRequest) {
+    public FilmDTO update(FilmUpdate filmRequest) {
         // проверки
         filmRequest.checkCorrectData();
         checkExistMpa(filmRequest.getMpa());

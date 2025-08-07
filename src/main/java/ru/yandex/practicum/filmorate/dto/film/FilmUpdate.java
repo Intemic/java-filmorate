@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Slf4j
 @Data
-public class UpdateFilmRequest {
+public class FilmUpdate{
     @NotNull
     private Long id;
     private String name;
