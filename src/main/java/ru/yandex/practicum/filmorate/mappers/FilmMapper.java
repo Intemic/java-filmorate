@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.mappers;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
 import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -21,6 +22,7 @@ public class FilmMapper {
         filmDTO.setDuration(film.getDuration());
         filmDTO.setMpa(film.getMpa());
         filmDTO.setGenres(new LinkedHashSet<>(film.getGenres()));
+        filmDTO.setDirectors(new LinkedHashSet<>(film.getDirectors()));
         return filmDTO;
     }
 
@@ -42,6 +44,11 @@ public class FilmMapper {
             film.setGenres(new HashSet<Genre>(filmRequest.getGenres().stream()
                     .map(GenreMapper::mapToGenre)
                     .toList()));
+        if (!filmRequest.getDirectors().isEmpty())
+            film.setDirectors(new HashSet<Director>(filmRequest.getDirectors().stream()
+                    .map( DirectorMapper::mapShortToDirector)
+                    .toList()));
+
         return film;
     }
 
@@ -73,6 +80,11 @@ public class FilmMapper {
                             .map(GenreMapper::mapToGenre)
                             .collect(Collectors.toSet())
             ));
+
+        if (updateFilm.hasDirectors())
+            film.setDirectors(updateFilm.getDirectors().stream()
+                    .map(directorShort -> Director.builder().id(directorShort.getId()).build())
+                    .collect(Collectors.toSet()));
 
         return film;
     }

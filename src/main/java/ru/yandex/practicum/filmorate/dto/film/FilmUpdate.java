@@ -5,9 +5,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.yandex.practicum.filmorate.dto.director.DirectorShort;
 import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ public class FilmUpdate{
     private Integer duration;
     private MpaShort mpa;
     private Set<GenreShort> genres = new HashSet<>(); //LinkedHashSet<>();
+    private Set<DirectorShort> directors = new HashSet<>();
 
     public boolean hasName() {
         return !(name == null || name.isBlank());
@@ -49,6 +52,10 @@ public class FilmUpdate{
 
     public boolean hasGenres() {
         return genres != null; //!(genres == null || genres.isEmpty());
+    }
+
+    public boolean hasDirectors() {
+        return directors != null;
     }
 
     public void checkCorrectData() {

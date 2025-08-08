@@ -70,3 +70,16 @@ CREATE TABLE IF NOT EXISTS reviews_likes (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT unique_keys_reviews_likes UNIQUE(review_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS directors (
+    id IDENTITY NOT NULL PRIMARY KEY,
+    name VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS films_director (
+    film_id BIGINT,
+    director_id BIGINT,
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (director_id) REFERENCES directors(id) ON DELETE CASCADE,
+    CONSTRAINT unique_keys_films_director UNIQUE(film_id, director_id)
+);

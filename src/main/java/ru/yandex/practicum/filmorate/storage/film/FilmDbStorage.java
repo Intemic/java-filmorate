@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -30,7 +29,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "       m.name AS mpa_name, " +
             "       g.id AS genre_id, " +
             "       g.name AS genre_name, " +
-            "       fl.user_id AS user_liked " +
+            "       fl.user_id AS user_liked, " +
+            "       d.id AS director_id, " +
+            "       d.name AS director_name " +
             "       FROM FILMS AS f LEFT JOIN MPA AS m " +
             "        ON f.mpa_id = m.id " +
             "       LEFT JOIN FILMS_GENRE AS fg " +
@@ -38,7 +39,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "       LEFT JOIN GENRES AS g " +
             "         ON g.ID  = fg.GENRE_ID " +
             "       LEFT JOIN films_liked AS fl " +
-            "         ON fl.film_id = f.id ";
+            "         ON fl.film_id = f.id " +
+            "       LEFT JOIN films_director AS fd " +
+            "         ON fd.film_id = f.id " +
+            "       LEFT JOIN directors AS d " +
+            "         ON d.id = fd.director_id ";
     private static final String INSERT_QUERY =
             "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
                     "VALUES (?, ?, ?, ?, ?)";
@@ -111,11 +116,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         Set<String> params = Set.of(by.split(","));
 
         if (params.contains(DIRECTOR))
-            sqlQuery.append(SEARCH_TEMPLATE.formatted("d.director_name", query));
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("d.name", query));
         if (params.contains(TITLE)) {
             if (!sqlQuery.isEmpty())
                 sqlQuery.append(" OR ");
-            sqlQuery.append(SEARCH_TEMPLATE.formatted("f.film_name", query));
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("f.name", query));
         }
 
         if (sqlQuery.isEmpty())
@@ -123,5 +128,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
         sqlQuery.insert(0, " WHERE ");
         sqlQuery.insert(0, BASE_GET_QUERY);
-        return jdbc.query(sqlQuery.toString(), mapper);
+
+        return jdbc.query(sqlQuery.toString(), filmExtractor);
     }}

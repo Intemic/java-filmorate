@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
@@ -35,18 +36,21 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final LikeStorage likeDbStorage;
+    private final DirectorStorage directorStorage;
 
     @Autowired
     public FilmService(@Qualifier("DBFilm") FilmStorage filmStorage,
                        UserService userService,
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
-                       LikeStorage likeDbStorage) {
+                       LikeStorage likeDbStorage,
+                       DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.userService = userService;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.likeDbStorage = likeDbStorage;
+        this.directorStorage = directorStorage;
     }
 
     public List<FilmDTO> getAll() {
@@ -64,6 +68,9 @@ public class FilmService {
         Film film = filmStorage.create(FilmMapper.mapToFilm(filmRequest));
         if (!film.getGenres().isEmpty())
             film.setGenres(new LinkedHashSet<>(genreStorage.setGenresForFilm(film)));
+        if (!film.getDirectors().isEmpty())
+            film.setDirectors(new LinkedHashSet<>(directorStorage.setDirectorsForFilm(film)));
+
         log.info("Создан новый фильм с id - {}", film.getId());
         return FilmMapper.mapToFilmDTO(film);
     }
@@ -79,8 +86,8 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundResource("Фильм не найден"));
 
         updatedFilm = filmStorage.update(updatedFilm);
-        if (!updatedFilm.getGenres().isEmpty())
-            updatedFilm.setGenres(new HashSet<>(genreStorage.updateGenresForFilm(updatedFilm)));
+        updatedFilm.setGenres(new HashSet<>(genreStorage.updateGenresForFilm(updatedFilm)));
+        updatedFilm.setDirectors(new HashSet<>(directorStorage.updateDirectorsForFilm(updatedFilm)));
 
         log.info("Изменены данные фильма id - {}", updatedFilm.getId());
         return FilmMapper.mapToFilmDTO(updatedFilm);

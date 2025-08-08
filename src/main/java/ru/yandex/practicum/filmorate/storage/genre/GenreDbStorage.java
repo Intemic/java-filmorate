@@ -23,6 +23,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
             "INNER JOIN GENRES g ON g.ID  = fg.GENRE_ID WHERE fg.film_id IN (%s)";
     private static final String INSERT_GENRE_QUERY = "INSERT INTO films_genre (film_id, genre_id)" +
             "VALUES(?, ?)";
+    private static final String DELETE_GENRES_FOR_FILM = "DELETE FROM films_genre WHERE film_id = ?";
 
     public GenreDbStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);
@@ -67,17 +68,8 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
 
     @Override
     public Collection<Genre> updateGenresForFilm(Film film) {
-        Collection<Genre> genresExist = getGenresForFilm(film);
-        Set<Genre> newGenres = film.getGenres().stream()
-                .filter(genre -> !genresExist.contains(genre))
-                .collect(Collectors.toSet());
-        if (!newGenres.isEmpty()) {
-            Film tempFilm = new Film();
-            tempFilm.setId(film.getId());
-            tempFilm.setGenres(newGenres);
-            setGenresForFilm(tempFilm);
-        }
-
+        delete(DELETE_GENRES_FOR_FILM, film.getId());
+        setGenresForFilm(film);
         return getGenresForFilm(film);
     }
 

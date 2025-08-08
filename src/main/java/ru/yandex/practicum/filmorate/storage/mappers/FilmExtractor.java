@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.mappers;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -35,6 +36,7 @@ public class FilmExtractor implements ResultSetExtractor<List<Film>> {
                                                     .build() : null)
                                     .genres(new TreeSet<>(Comparator.comparing(Genre::getId)))
                                     .userLiked(new TreeSet<>(Long::compare))
+                                    .directors(new TreeSet<>(Comparator.comparing(Director::getId)))
                                     .build();
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
@@ -50,6 +52,12 @@ public class FilmExtractor implements ResultSetExtractor<List<Film>> {
 
             if (rs.getLong("user_liked") != 0)
                 film.getUserLiked().add(rs.getLong("user_liked"));
+
+            if (rs.getLong("director_id") != 0)
+                film.getDirectors().add(Director.builder()
+                        .id(rs.getLong("director_id"))
+                        .name(rs.getString("director_name"))
+                        .build());
         }
 
         return filmMap.values().stream().toList();
