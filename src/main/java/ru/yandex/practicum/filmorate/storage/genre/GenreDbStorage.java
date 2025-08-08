@@ -44,23 +44,6 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
     }
 
     @Override
-    public void fillGenresForFilms(List<Film> films) {
-        Map<Long, Film> filmMap = films.stream()
-                .collect(Collectors.toMap(Film::getId, film -> film));
-
-        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
-        Object[] ids = films.stream()
-                .map(Film::getId)
-                .toArray();
-
-        jdbc.query(String.format(FIND_ALL_GENRES_FOR_FILMS, inSql),
-                ids,
-                (rs, rowNum) -> filmMap.get(rs.getLong("film_id"))
-                        .getGenres().add(new Genre(rs.getLong("id"), rs.getString("name")))
-        );
-    }
-
-    @Override
     public Collection<Genre> setGenresForFilm(Film film) {
         Set<Genre> genres = film.getGenres();
         Iterator<Genre> iterator = genres.iterator();

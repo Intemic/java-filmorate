@@ -14,8 +14,6 @@ public interface GenreStorage {
 
     Collection<Genre> getGenresForFilm(Film film);
 
-    void fillGenresForFilms(List<Film> films);
-
     Collection<Genre> setGenresForFilm(Film film);
 
     Collection<Genre> updateGenresForFilm(Film film);

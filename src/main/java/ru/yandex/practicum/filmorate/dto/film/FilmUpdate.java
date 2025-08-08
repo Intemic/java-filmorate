@@ -48,7 +48,7 @@ public class FilmUpdate{
     }
 
     public boolean hasGenres() {
-        return !(genres.isEmpty());
+        return genres != null; //!(genres == null || genres.isEmpty());
     }
 
     public void checkCorrectData() {

@@ -31,23 +31,6 @@ public class LikeDbStorage extends BaseDbStorage<Like> implements LikeStorage {
     }
 
     @Override
-    public void fillLikedForFilms(List<Film> films) {
-        Map<Long, Film> filmMap = films.stream()
-                .collect(Collectors.toMap(Film::getId, film -> film));
-
-        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
-        Object[] ids = films.stream()
-                .map(Film::getId)
-                .toArray();
-
-        jdbc.query(String.format(FIND_LIKES_FOR_ALL_FILMS, inSql),
-                ids,
-                (rs, rowNum) -> filmMap.get(rs.getLong("film_id"))
-                        .getUserLiked().add(rs.getLong("user_id"))
-        );
-    }
-
-    @Override
     public void addUserLiked(Long filmId, Long userId) {
         insert(INSERT_LIKE_FOR_FILM,
                 filmId,

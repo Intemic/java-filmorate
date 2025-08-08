@@ -28,11 +28,11 @@ public class FilmExtractor implements ResultSetExtractor<List<Film>> {
                                     .description(rs.getString("description"))
                                     .releaseDate(rs.getDate("release_date").toLocalDate())
                                     .duration(rs.getInt("duration"))
-//                                    .mpa(rs.getLong("mpa_id") != 0 ?
-//                                            Mpa.builder()
-//                                                    .id(rs.getLong("mpa_id"))
-//                                                    .name(rs.getString("mpa_name"))
-//                                                    .build() : null)
+                                    .mpa(rs.getLong("mpa_id") != 0 ?
+                                            Mpa.builder()
+                                                    .id(rs.getLong("mpa_id"))
+                                                    .name(rs.getString("mpa_name"))
+                                                    .build() : null)
                                     .genres(new TreeSet<>(Comparator.comparing(Genre::getId)))
                                     .userLiked(new TreeSet<>(Long::compare))
                                     .build();
@@ -41,12 +41,6 @@ public class FilmExtractor implements ResultSetExtractor<List<Film>> {
                         }
                     }
             );
-
-            if (rs.getLong("mpa_id") != 0)
-                film.setMpa(Mpa.builder()
-                        .id(rs.getLong("mpa_id"))
-                        .name(rs.getString("mpa_name"))
-                        .build());
 
             if (rs.getLong("genre_id") != 0)
                 film.getGenres().add(Genre.builder()

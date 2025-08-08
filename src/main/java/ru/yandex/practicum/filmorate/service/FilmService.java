@@ -49,15 +49,8 @@ public class FilmService {
         this.likeDbStorage = likeDbStorage;
     }
 
-    private List<Film> getAllFilms() {
-        List<Film> films = filmStorage.getAll();
-//        genreStorage.fillGenresForFilms(films);
-//        likeDbStorage.fillLikedForFilms(films);
-        return films;
-    }
-
     public List<FilmDTO> getAll() {
-        return getAllFilms().stream()
+        return filmStorage.getAll().stream()
                 .map(FilmMapper::mapToFilmDTO)
                 .collect(Collectors.toList());
     }
@@ -99,8 +92,6 @@ public class FilmService {
             throw new NotFoundResource("Фильм не найден");
 
         Film film = optionalFilm.get();
-        //genreStorage.fillGenresForFilms(List.of(film));
-        //likeDbStorage.fillLikedForFilms(List.of(film));
         return film;
     }
 
@@ -137,7 +128,7 @@ public class FilmService {
             return Long.compare(film2.getUserLiked().size(), film1.getUserLiked().size());
         };
 
-        return getAllFilms().stream()
+        return filmStorage.getAll().stream() //getAllFilms().stream()
                 .sorted(comparatorFilm)
                 .skip(Math.max(filmStorage.getAll().size() - (showCount + 1), 0))
                 .map(FilmMapper::mapToFilmDTO)
@@ -158,10 +149,7 @@ public class FilmService {
     }
 
     public List<FilmDTO> search(String query, String by) {
-        List<Film> films = filmStorage.searchFilms(query, by);
-        genreStorage.fillGenresForFilms(films);
-        likeDbStorage.fillLikedForFilms(films);
-        return films.stream()
+        return filmStorage.searchFilms(query, by).stream()
                 .sorted((film1, film2) -> (film2.getUserLiked().size() - film1.getUserLiked().size()))
                 .map(film -> FilmMapper.mapToFilmDTO(film))
                 .toList();

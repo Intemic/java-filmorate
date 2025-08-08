@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,24 +21,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String TITLE = "title";
     private static final String SEARCH_TEMPLATE = "%s ILIKE '%%%s%%'";
     private final FilmExtractor filmExtractor;
-    private static final String FIND_ALL_QUERY = "SELECT f.id," +
-            "f.name, " +
-            "f.description, " +
-            "f.release_date, " +
-            "f.duration, " +
-            "f.mpa_id, " +
-            "m.name AS mpa_name " +
-            "FROM FILMS AS f LEFT JOIN MPA AS m " +
-            "ON f.mpa_id = m.id";
-    private static final String FIND_BY_ID_QUERY = "SELECT f.id, " +
-            "f.name, " +
-            "f.description, " +
-            "f.release_date, " +
-            "f.duration, " +
-            "f.mpa_id, " +
-            "m.name AS mpa_name " +
-            "FROM FILMS AS f LEFT JOIN MPA AS m " +
-            "ON f.mpa_id = m.id WHERE f.id = ?";
     private static final String BASE_GET_QUERY = "SELECT f.id, " +
             "       f.name, " +
             "       f.description, " +
@@ -110,15 +93,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Optional<Film> get(Long id) {
         String sql = BASE_GET_QUERY + " WHERE f.id = ?";
-//        return Optional.ofNullable(jdbc.query(sql, filmExtractor, id).getFirst()); //getSingle(FIND_BY_ID_QUERY, id);
-//        return getSingle(FIND_BY_ID_QUERY, id);
         try {
             List<Film> films = jdbc.query(sql, filmExtractor, id);
             if (films.isEmpty())
                 return Optional.empty();
 
             return Optional.of(films.getFirst());
-        } catch (EmptyResultDataAccessException ignored) {
+        } catch (DataAccessException ignored) {
             return Optional.empty();
         }
     }
@@ -141,6 +122,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             return List.of();
 
         sqlQuery.insert(0, " WHERE ");
-        sqlQuery.insert(0, FIND_ALL_QUERY);
+        sqlQuery.insert(0, BASE_GET_QUERY);
         return jdbc.query(sqlQuery.toString(), mapper);
     }}
