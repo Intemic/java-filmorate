@@ -75,5 +75,4 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return getSingle(FIND_BY_ID_QUERY, id);
     }
 
-
 }
