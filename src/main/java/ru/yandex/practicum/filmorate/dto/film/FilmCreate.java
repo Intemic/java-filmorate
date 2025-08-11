@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.yandex.practicum.filmorate.dto.director.DirectorShort;
 import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
@@ -17,7 +18,7 @@ import java.util.Set;
 
 @Slf4j
 @Data
-public class NewFilmRequest {
+public class FilmCreate {
     @NotBlank
     private String name;
     @NotBlank
@@ -31,6 +32,7 @@ public class NewFilmRequest {
     private Integer duration;
     private MpaShort mpa;
     private Set<GenreShort> genres = new HashSet<>();
+    private Set<DirectorShort> directors = new HashSet<>();
 
     public void checkCorrectData() {
         if (releaseDate.isBefore(LocalDate.of(1895, 12, 28))) {

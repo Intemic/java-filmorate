@@ -10,8 +10,6 @@ import java.util.Optional;
 public interface LikeStorage {
     Optional<Like> getUsersLiked(Long filmId);
 
-    void fillLikedForFilms(List<Film> films);
-
     void addUserLiked(Long filmId, Long userId);
 
     void deleteUserLiked(Long filmId, Long userId);

@@ -3,13 +3,11 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 
 @Builder
-@Setter
-@Getter
-@ToString
+@Data
+@EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"name"})
-public class Genre {
+public class Director {
     private Long id;
     private String name;
 }

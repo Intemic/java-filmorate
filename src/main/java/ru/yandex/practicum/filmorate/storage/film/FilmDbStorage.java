@@ -1,25 +1,53 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
+import ru.yandex.practicum.filmorate.storage.mappers.FilmExtractor;
 
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository("DBFilm")
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
-    private static final String FIND_ALL_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
-            "ON f.mpa_id = m.id";
-    private static final String FIND_BY_ID_QUERY = "SELECT f.id, f.name, f.description, f.release_date, " +
-            "f.duration, f.mpa_id, m.name AS mpa_name FROM FILMS AS f LEFT JOIN MPA AS m " +
-            "ON f.mpa_id = m.id WHERE f.id = ?";
+    private static final String DIRECTOR = "director";
+    private static final String TITLE = "title";
+    private static final String YEAR = "year";
+    private static final String LIKES = "likes";
 
+    private static final String SEARCH_TEMPLATE = "%s ILIKE '%%%s%%'";
+    private final FilmExtractor filmExtractor;
+    private static final String BASE_GET_QUERY = "SELECT f.id, " +
+            "       f.name, " +
+            "       f.description, " +
+            "       f.release_date, " +
+            "       f.duration, " +
+            "       f.mpa_id, " +
+            "       m.name AS mpa_name, " +
+            "       g.id AS genre_id, " +
+            "       g.name AS genre_name, " +
+            "       fl.user_id AS user_liked, " +
+            "       d.id AS director_id, " +
+            "       d.name AS director_name " +
+            "       FROM FILMS AS f LEFT JOIN MPA AS m " +
+            "        ON f.mpa_id = m.id " +
+            "       LEFT JOIN FILMS_GENRE AS fg " +
+            "         ON fg.film_id = f.id " +
+            "       LEFT JOIN GENRES AS g " +
+            "         ON g.ID  = fg.GENRE_ID " +
+            "       LEFT JOIN films_liked AS fl " +
+            "         ON fl.film_id = f.id " +
+            "       LEFT JOIN films_director AS fd " +
+            "         ON fd.film_id = f.id " +
+            "       LEFT JOIN directors AS d " +
+            "         ON d.id = fd.director_id ";
     private static final String INSERT_QUERY =
             "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
                     "VALUES (?, ?, ?, ?, ?)";
@@ -27,8 +55,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             " duration = ?, mpa_id = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
 
-    public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
+    public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, FilmExtractor filmExtractor) {
         super(jdbc, mapper);
+        this.filmExtractor = filmExtractor;
     }
 
     @Override
@@ -67,12 +96,61 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        return getMany(FIND_ALL_QUERY);
+        return jdbc.query(BASE_GET_QUERY, filmExtractor); //getMany(FIND_ALL_QUERY);
     }
 
     @Override
     public Optional<Film> get(Long id) {
-        return getSingle(FIND_BY_ID_QUERY, id);
+        String sql = BASE_GET_QUERY + " WHERE f.id = ?";
+        try {
+            List<Film> films = jdbc.query(sql, filmExtractor, id);
+            if (films.isEmpty())
+                return Optional.empty();
+
+            return Optional.of(films.getFirst());
+        } catch (DataAccessException ignored) {
+            return Optional.empty();
+        }
     }
 
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        StringBuilder sqlQuery = new StringBuilder();
+        Set<String> params = Set.of(by.split(","));
+
+        if (params.contains(DIRECTOR))
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("d.name", query));
+        if (params.contains(TITLE)) {
+            if (!sqlQuery.isEmpty())
+                sqlQuery.append(" OR ");
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("f.name", query));
+        }
+
+        if (sqlQuery.isEmpty())
+            return List.of();
+
+        sqlQuery.insert(0, " WHERE ");
+        sqlQuery.insert(0, BASE_GET_QUERY);
+
+        return jdbc.query(sqlQuery.toString(), filmExtractor);
+    }
+
+    @Override
+    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
+        StringBuilder sqlQuery = new StringBuilder(BASE_GET_QUERY)
+                .append(" WHERE d.id = " + directorId);
+        List<Film> films = jdbc.query(sqlQuery.toString(), filmExtractor);
+
+        if (sortBy.equals(YEAR))
+            films = films.stream()
+                    .sorted(Comparator.comparingInt(film -> film.getReleaseDate().getYear()))
+                    .toList();
+        else if (sortBy.equals(LIKES))
+          return films = films.stream()
+                  .sorted(Comparator.comparingInt(film -> film.getUserLiked().size()))
+                  .toList();
+
+        return films;
+    }
 }

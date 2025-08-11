@@ -8,11 +8,12 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Slf4j
+@Builder
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString
+@AllArgsConstructor
 public class Film {
     private Long id;
     private String name;
@@ -26,6 +27,7 @@ public class Film {
     private Mpa mpa;
     private Set<Long> userLiked = new LinkedHashSet<>();
     private Set<Genre> genres = new LinkedHashSet<>();
+    private Set<Director> directors = new LinkedHashSet<>();
 
     public Film() {
     }

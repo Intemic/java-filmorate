@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
 import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
@@ -14,8 +14,8 @@ import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
@@ -36,34 +36,30 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final LikeStorage likeDbStorage;
+    private final DirectorStorage directorStorage;
 
     @Autowired
     public FilmService(@Qualifier("DBFilm") FilmStorage filmStorage,
                        UserService userService,
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
-                       LikeStorage likeDbStorage) {
+                       LikeStorage likeDbStorage,
+                       DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.userService = userService;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.likeDbStorage = likeDbStorage;
-    }
-
-    private List<Film> getAllFilms() {
-        List<Film> films = filmStorage.getAll();
-        genreStorage.fillGenresForFilms(films);
-        likeDbStorage.fillLikedForFilms(films);
-        return films;
+        this.directorStorage = directorStorage;
     }
 
     public List<FilmDTO> getAll() {
-        return getAllFilms().stream()
+        return filmStorage.getAll().stream()
                 .map(FilmMapper::mapToFilmDTO)
                 .collect(Collectors.toList());
     }
 
-    public FilmDTO create(NewFilmRequest filmRequest) {
+    public FilmDTO create(FilmCreate filmRequest) {
         // проверки
         filmRequest.checkCorrectData();
         checkExistMpa(filmRequest.getMpa());
@@ -72,11 +68,14 @@ public class FilmService {
         Film film = filmStorage.create(FilmMapper.mapToFilm(filmRequest));
         if (!film.getGenres().isEmpty())
             film.setGenres(new LinkedHashSet<>(genreStorage.setGenresForFilm(film)));
+        if (!film.getDirectors().isEmpty())
+            film.setDirectors(new LinkedHashSet<>(directorStorage.setDirectorsForFilm(film)));
+
         log.info("Создан новый фильм с id - {}", film.getId());
         return FilmMapper.mapToFilmDTO(film);
     }
 
-    public FilmDTO update(UpdateFilmRequest filmRequest) {
+    public FilmDTO update(FilmUpdate filmRequest) {
         // проверки
         filmRequest.checkCorrectData();
         checkExistMpa(filmRequest.getMpa());
@@ -87,8 +86,8 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundResource("Фильм не найден"));
 
         updatedFilm = filmStorage.update(updatedFilm);
-        if (!updatedFilm.getGenres().isEmpty())
-            updatedFilm.setGenres(new HashSet<>(genreStorage.updateGenresForFilm(updatedFilm)));
+        updatedFilm.setGenres(new HashSet<>(genreStorage.updateGenresForFilm(updatedFilm)));
+        updatedFilm.setDirectors(new HashSet<>(directorStorage.updateDirectorsForFilm(updatedFilm)));
 
         log.info("Изменены данные фильма id - {}", updatedFilm.getId());
         return FilmMapper.mapToFilmDTO(updatedFilm);
@@ -100,12 +99,6 @@ public class FilmService {
             throw new NotFoundResource("Фильм не найден");
 
         Film film = optionalFilm.get();
-        Collection<Genre> genres = genreStorage.getGenresForFilm(film);
-        if (!genres.isEmpty())
-            film.setGenres(new HashSet<>(genres));
-        Optional<Like> like = likeDbStorage.getUsersLiked(film.getId());
-        like.ifPresent(value -> film.setUserLiked(value.getUsers()));
-
         return film;
     }
 
@@ -142,7 +135,7 @@ public class FilmService {
             return Long.compare(film2.getUserLiked().size(), film1.getUserLiked().size());
         };
 
-        return getAllFilms().stream()
+        return filmStorage.getAll().stream() //getAllFilms().stream()
                 .sorted(comparatorFilm)
                 .skip(Math.max(filmStorage.getAll().size() - (showCount + 1), 0))
                 .map(FilmMapper::mapToFilmDTO)
@@ -160,5 +153,17 @@ public class FilmService {
     private void checkExistMpa(MpaShort mpa) {
         if (mpa != null && mpaStorage.get(mpa.getId()).isEmpty())
             throw new NotFoundResource("MPA - " + mpa.getId() + " отсутствует");
+    }
+
+    public List<FilmDTO> search(String query, String by) {
+        return filmStorage.searchFilms(query, by).stream()
+                .sorted((film1, film2) -> (film2.getUserLiked().size() - film1.getUserLiked().size()))
+                .map(film -> FilmMapper.mapToFilmDTO(film))
+                .toList();
+    }
+
+    public List<FilmDTO> getFilmsForDirector(Long directorId, String sortBy) {
+        return filmStorage.getFilmsForDirector(directorId, sortBy).stream()
+                .map(FilmMapper::mapToFilmDTO).toList();
     }
 }

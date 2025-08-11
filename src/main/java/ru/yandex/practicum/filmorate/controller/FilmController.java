@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.config.AppConfig;
+import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -40,14 +40,27 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
+    @GetMapping("/search")
+    public List<FilmDTO> search(@RequestParam String query,
+                                @RequestParam String by) {
+        return filmService.search(query, by);
+    }
+
+
+    @GetMapping("/director/{directorId}")
+    public List<FilmDTO> getFilmsForDirector(@PathVariable @Positive Long directorId,
+                                             @RequestParam String sortBy) {
+       return filmService.getFilmsForDirector(directorId, sortBy);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FilmDTO create(@RequestBody @Valid NewFilmRequest film) {
+    public FilmDTO create(@RequestBody @Valid FilmCreate film) {
         return filmService.create(film);
     }
 
     @PutMapping
-    public FilmDTO update(@RequestBody @Valid UpdateFilmRequest filmRequest) {
+    public FilmDTO update(@RequestBody @Valid FilmUpdate filmRequest) {
         return filmService.update(filmRequest);
     }
 
@@ -64,5 +77,7 @@ public class FilmController {
                                   @PathVariable("userId") @Positive Long userId) {
         filmService.deleteLikeTheMove(filmId, userId);
     }
+
+
 
 }
