@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.mappers.FilmExtractor;
 
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -18,6 +19,9 @@ import java.util.Set;
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String DIRECTOR = "director";
     private static final String TITLE = "title";
+    private static final String YEAR = "year";
+    private static final String LIKES = "likes";
+
     private static final String SEARCH_TEMPLATE = "%s ILIKE '%%%s%%'";
     private final FilmExtractor filmExtractor;
     private static final String BASE_GET_QUERY = "SELECT f.id, " +
@@ -130,4 +134,23 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         sqlQuery.insert(0, BASE_GET_QUERY);
 
         return jdbc.query(sqlQuery.toString(), filmExtractor);
-    }}
+    }
+
+    @Override
+    public List<Film> getFilmsForDirector(Long directorId, String sortBy) {
+        StringBuilder sqlQuery = new StringBuilder(BASE_GET_QUERY)
+                .append(" WHERE d.id = " + directorId);
+        List<Film> films = jdbc.query(sqlQuery.toString(), filmExtractor);
+
+        if (sortBy.equals(YEAR))
+            films = films.stream()
+                    .sorted(Comparator.comparingInt(film -> film.getReleaseDate().getYear()))
+                    .toList();
+        else if (sortBy.equals(LIKES))
+          return films = films.stream()
+                  .sorted(Comparator.comparingInt(film -> film.getUserLiked().size()))
+                  .toList();
+
+        return films;
+    }
+}

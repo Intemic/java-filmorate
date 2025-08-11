@@ -161,4 +161,9 @@ public class FilmService {
                 .map(film -> FilmMapper.mapToFilmDTO(film))
                 .toList();
     }
+
+    public List<FilmDTO> getFilmsForDirector(Long directorId, String sortBy) {
+        return filmStorage.getFilmsForDirector(directorId, sortBy).stream()
+                .map(FilmMapper::mapToFilmDTO).toList();
+    }
 }

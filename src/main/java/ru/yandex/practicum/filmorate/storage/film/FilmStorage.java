@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface FilmStorage extends BaseStorage<Film> {
     List<Film> searchFilms(String query, String by);
+
+    List<Film> getFilmsForDirector(Long directorId, String sortBy);
 }
