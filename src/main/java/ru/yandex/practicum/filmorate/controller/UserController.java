@@ -59,6 +59,11 @@ public class UserController {
         userService.addFriend(userId, friendId);
     }
 
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable @Positive Long userId) {
+        userService.deleteUser(userId);
+    }
+
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(@PathVariable("id") @Positive Long userId,

@@ -166,4 +166,9 @@ public class FilmService {
         return filmStorage.getFilmsForDirector(directorId, sortBy).stream()
                 .map(FilmMapper::mapToFilmDTO).toList();
     }
+
+    public void deleteFilm(Long filmId) {
+        getOneFilm(filmId);
+        filmStorage.delete(filmId);
+    }
 }

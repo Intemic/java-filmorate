@@ -121,4 +121,9 @@ public class UserService {
                 .map(userId -> (userStorage.get(userId)).get())
                 .toList();
     }
+
+    public void deleteUser(Long userId) {
+        getOneUser(userId);
+        userStorage.delete(userId);
+    }
 }
