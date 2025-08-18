@@ -113,7 +113,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
     }
 
-
     @Override
     public List<Film> searchFilms(String query, String by) {
         StringBuilder sqlQuery = new StringBuilder();
@@ -152,5 +151,15 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                   .toList();
 
         return films;
+    }
+
+    @Override
+    public List<Film> common(long userId, long friendId) {
+        String sqlRequest = BASE_GET_QUERY + " WHERE fl.user_id = %d OR fl.user_id = %d".formatted(userId, friendId);
+        List<Film> userFilms = jdbc.query(sqlRequest, filmExtractor);
+        return userFilms.stream()
+                .filter( film -> film.getUserLiked().contains(userId) && film.getUserLiked().contains(friendId))
+                .sorted( (film1, film2) -> film2.getUserLiked().size() - film1.getUserLiked().size())
+                .toList();
     }
 }

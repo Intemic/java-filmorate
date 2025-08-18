@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
 import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -170,5 +171,19 @@ public class FilmService {
     public void deleteFilm(Long filmId) {
         getOneFilm(filmId);
         filmStorage.delete(filmId);
+    }
+
+    public List<FilmDTO> common(long userId, long friendId) {
+       // проверки
+       userService.getOneUser(userId);
+       userService.getOneUser(friendId);
+//       if (userService.getFriends(userId).stream()
+//               .filter( user -> user.getId() == friendId)
+//               .findFirst().isEmpty())
+//           throw new ValidationException("Пользователь %d не является другом %d".formatted(friendId, userId));
+
+       return filmStorage.common(userId, friendId).stream()
+               .map( film -> FilmMapper.mapToFilmDTO(film))
+               .toList();
     }
 }

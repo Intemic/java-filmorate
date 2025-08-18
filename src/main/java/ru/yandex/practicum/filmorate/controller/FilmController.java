@@ -40,6 +40,12 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
+    @GetMapping("/common")
+    public List<FilmDTO> common(@RequestParam @Positive Long userId,
+                                @RequestParam @Positive Long friendId) {
+        return filmService.common(userId, friendId);
+    }
+
     @GetMapping("/search")
     public List<FilmDTO> search(@RequestParam String query,
                                 @RequestParam String by) {

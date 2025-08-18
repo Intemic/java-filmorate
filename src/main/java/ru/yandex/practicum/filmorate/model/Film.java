@@ -11,7 +11,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = {"id"})
 @ToString
 @AllArgsConstructor
 public class Film {
