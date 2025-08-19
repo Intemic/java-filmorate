@@ -34,10 +34,12 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<FilmDTO> getPopularFilms(
-            @RequestParam(required = false) @Positive Integer count) {
+            @RequestParam(required = false) @Positive Integer count,
+            @RequestParam(required = false) @Positive Long genreId,
+            @RequestParam(required = false) @Positive Integer year) {
         if (count == null)
             count = appConfig.getFilm().getPopular().getShow().getCount();
-        return filmService.getPopularFilms(count);
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
     @GetMapping("/common")

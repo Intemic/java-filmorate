@@ -126,9 +126,14 @@ public class FilmService {
         changeLikeTheMove(filmId, userId, DELETE);
     }
 
-    public List<FilmDTO> getPopularFilms(int showCount) {
+    public List<FilmDTO> getPopularFilms(int showCount, Long genreId, Integer year) {
+        final Genre genre = genreId != null ? genreStorage.get(genreId)
+                .orElseThrow(() -> new NotFoundResource("Жанр не найден")) : null;
         return filmStorage.getAll().stream()
                 .sorted((film1, film2) -> (film2.getUserLiked().size() - film1.getUserLiked().size()))
+                .filter(film ->
+                        (genre != null ? film.getGenres().contains(genre) : true)
+                                && (year != null ? film.getReleaseDate().getYear() == year : true))
                 .limit(showCount)
                 .map(FilmMapper::mapToFilmDTO)
                 .toList();
@@ -167,12 +172,12 @@ public class FilmService {
     }
 
     public List<FilmDTO> common(long userId, long friendId) {
-       // проверки
-       userService.getOneUser(userId);
-       userService.getOneUser(friendId);
+        // проверки
+        userService.getOneUser(userId);
+        userService.getOneUser(friendId);
 
-       return filmStorage.common(userId, friendId).stream()
-               .map( film -> FilmMapper.mapToFilmDTO(film))
-               .toList();
+        return filmStorage.common(userId, friendId).stream()
+                .map(film -> FilmMapper.mapToFilmDTO(film))
+                .toList();
     }
 }
