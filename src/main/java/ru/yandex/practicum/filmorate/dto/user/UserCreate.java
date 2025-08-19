@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Slf4j
-public class NewUserRequest {
+public class UserCreate {
     @NonNull
     @NotBlank(message = "Некорректный email")
     @Email(message = "Некорректный email")

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Slf4j
 @Data
-public class UpdateUserRequest {
+public class UserUpdate {
     @NotNull
     private Long id;
     @Email(message = "Некорректный email")

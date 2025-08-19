@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserCreate;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -78,7 +78,7 @@ class FilmorateApplicationTests {
     @Test
     public void testValidationCreateUser() {
 
-        NewUserRequest userRequest = new NewUserRequest("@yandex.ru", "test", LocalDate.now().plusYears(1));
+        UserCreate userRequest = new UserCreate("@yandex.ru", "test", LocalDate.now().plusYears(1));
         ValidationException except = assertThrows(ValidationException.class,
                 userRequest::checkCorrectData);
         assertEquals("Некорректная дата рождения", except.getMessage());

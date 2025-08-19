@@ -3,14 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserCreate;
+import ru.yandex.practicum.filmorate.dto.user.UserUpdate;
 import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
-import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.frend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utill.Operation;
 
@@ -24,12 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserStorage userStorage;
-    private final FriendStorage friendStorage;
 
-    public UserService(@Qualifier("DBUser") UserStorage userStorage,
-                       FriendStorage friendStorage) {
+    public UserService(@Qualifier("DBUser") UserStorage userStorage) {
         this.userStorage = userStorage;
-        this.friendStorage = friendStorage;
     }
 
     public List<UserDTO> getAll() {
@@ -39,22 +34,16 @@ public class UserService {
     }
 
     public User getOneUser(Long id) {
-        User user;
-
         Optional<User> optionalUser = userStorage.get(id);
         if (optionalUser.isEmpty()) {
             log.error(String.format("Не найден пользователь с id - %d", id));
             throw new NotFoundResource(String.format("Не найден пользователь с id - %d", id));
         }
 
-        user = optionalUser.get();
-
-        Optional<Friend> friendOptional = friendStorage.getFriends(id);
-        friendOptional.ifPresent(friend -> user.setFriends(friend.getFriends()));
-        return user;
+        return optionalUser.get();
     }
 
-    public UserDTO create(NewUserRequest userRequest) {
+    public UserDTO create(UserCreate userRequest) {
         userRequest.checkCorrectData();
         if (userRequest.getName() == null || userRequest.getName().isBlank())
             userRequest.setName(userRequest.getLogin());
@@ -64,7 +53,7 @@ public class UserService {
     }
 
 
-    public UserDTO update(UpdateUserRequest userRequest) {
+    public UserDTO update(UserUpdate userRequest) {
         userRequest.checkCorrectData();
         User oldUser = getOneUser(userRequest.getId());
         User updateUser = userStorage.update(UserMapper.updateUserFields(oldUser, userRequest));
@@ -85,10 +74,10 @@ public class UserService {
             case ADD:
                 Set<Long> listFriends = user.getFriends();
                 if (!listFriends.contains(friendId))
-                    friendStorage.addFriend(userId, friendId);
+                    userStorage.addFriend(userId, friendId);
                 break;
             case DELETE:
-                friendStorage.deleteFriend(userId, friendId);
+                userStorage.deleteFriend(userId, friendId);
                 break;
         }
     }

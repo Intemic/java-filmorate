@@ -11,4 +11,8 @@ public interface FilmStorage extends BaseStorage<Film> {
     List<Film> getFilmsForDirector(Long directorId, String sortBy);
 
     List<Film> common(long userId, long friendId);
+
+    void addUserLiked(Long filmId, Long userId);
+
+    void deleteUserLiked(Long filmId, Long userId);
 }

@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import ru.yandex.practicum.filmorate.exeption.InternalServerException;
@@ -12,10 +13,15 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class BaseDbStorage<T> {
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
+    protected ResultSetExtractor<List<T>> extractor;
+
+    public BaseDbStorage(JdbcTemplate jdbc, RowMapper<T> mapper) {
+        this.jdbc = jdbc;
+        this.mapper = mapper;
+    }
 
     protected Optional<T> getSingle(String query, Long id) {
         try {
@@ -26,8 +32,24 @@ public class BaseDbStorage<T> {
         }
     }
 
+    protected Optional<T> getSingleExtractor(String query, Long id) {
+        try {
+            List<T> objects = jdbc.query(query, extractor, id);
+            if (objects.isEmpty())
+                return Optional.empty();
+
+            return Optional.of(objects.getFirst());
+        } catch (DataAccessException ignored) {
+            return Optional.empty();
+        }
+    }
+
     protected List<T> getMany(String query, Object... params) {
         return jdbc.query(query, mapper, params);
+    }
+
+    public List<T> getManyExtractor(String query, Object... params) {
+        return jdbc.query(query, extractor, params);
     }
 
     protected long insert(String query, Object... params) {
@@ -58,11 +80,6 @@ public class BaseDbStorage<T> {
             throw new InternalServerException("Не удалось обновить данные");
         }
     }
-
-//    protected boolean delete(String query, Long id) {
-//        int countDelete = jdbc.update(query, id);
-//        return countDelete > 0;
-//    }
 
     protected boolean delete(String query, Object... params) {
         int countDelete = jdbc.update(query, params);

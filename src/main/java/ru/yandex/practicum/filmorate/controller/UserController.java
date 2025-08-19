@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserCreate;
+import ru.yandex.practicum.filmorate.dto.user.UserUpdate;
 import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -44,18 +44,18 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO create(@RequestBody @Valid NewUserRequest user) {
+    public UserDTO create(@RequestBody @Valid UserCreate user) {
         return userService.create(user);
     }
 
     @PutMapping
-    public UserDTO update(@RequestBody @Valid UpdateUserRequest user) {
+    public UserDTO update(@RequestBody @Valid UserUpdate user) {
         return userService.update(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable("id") @Positive Long userId,
-                          @PathVariable("friendId") @Positive Long friendId) {
+    public void addFriend(@PathVariable("id") Long userId,
+                          @PathVariable("friendId") Long friendId) {
         userService.addFriend(userId, friendId);
     }
 

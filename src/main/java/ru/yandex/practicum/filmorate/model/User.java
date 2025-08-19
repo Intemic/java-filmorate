@@ -10,9 +10,12 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@Builder
 @Slf4j
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = {"id"})
 public class User {
     private Long id;
     @NonNull

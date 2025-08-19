@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserCreate;
+import ru.yandex.practicum.filmorate.dto.user.UserUpdate;
 import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -16,7 +16,7 @@ public class UserMapper {
         return userDTO;
     }
 
-    public static User mapToUser(NewUserRequest userRequest) {
+    public static User mapToUser(UserCreate userRequest) {
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
@@ -25,7 +25,7 @@ public class UserMapper {
         return user;
     }
 
-    public static User updateUserFields(User user, UpdateUserRequest userRequest) {
+    public static User updateUserFields(User user, UserUpdate userRequest) {
         if (userRequest.hasEmail())
             user.setEmail(userRequest.getEmail());
 

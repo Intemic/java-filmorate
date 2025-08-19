@@ -72,20 +72,20 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void likeTheMove(@PathVariable("id") @Positive Long filmId,
-                            @PathVariable("userId") @Positive Long userId) {
+    public void likeTheMove(@PathVariable("id") Long filmId,
+                            @PathVariable("userId") Long userId) {
         filmService.likeTheMove(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteLikeTheMove(@PathVariable("id") @Positive Long filmId,
-                                  @PathVariable("userId") @Positive Long userId) {
+    public void deleteLikeTheMove(@PathVariable("id") Long filmId,
+                                  @PathVariable("userId") Long userId) {
         filmService.deleteLikeTheMove(filmId, userId);
     }
 
     @DeleteMapping("/{filmId}")
-    public void deleteFilm(@PathVariable @Positive Long filmId) {
+    public void deleteFilm(@PathVariable Long filmId) {
         filmService.deleteFilm(filmId);
     }
 
