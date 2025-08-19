@@ -103,6 +103,8 @@ public class UserService {
 
     public List<User> getFriends(Long id) {
         User user = getOneUser(id);
+        Set<Long> friends = user.getFriends();
+
         return user.getFriends().stream()
                 .filter(userId -> userStorage.get(userId).isPresent())
                 .map(userId -> (userStorage.get(userId)).get())

@@ -29,14 +29,14 @@ public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
-    public ErrorResponse handleAnnotationValidException(MethodArgumentNotValidException e) {
+    public ErrorResponse handleAnnotationValidException(Exception e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(Throwable e) {
+    public ErrorResponse handleException(Exception e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
