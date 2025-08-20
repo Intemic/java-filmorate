@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {

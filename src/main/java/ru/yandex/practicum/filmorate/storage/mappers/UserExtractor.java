@@ -18,8 +18,7 @@ public class UserExtractor implements ResultSetExtractor<List<User>> {
         while (rs.next()) {
             Long id = rs.getLong("id");
             User user = users.computeIfAbsent(rs.getLong("id"),
-                    aLong ->
-                    {
+                    aLong -> {
                         try {
                             return User.builder()
                                     .id(id)
@@ -32,7 +31,7 @@ public class UserExtractor implements ResultSetExtractor<List<User>> {
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
-                    }) ;
+                    });
 
             if (rs.getLong("friend_id") != 0)
                 user.getFriends().add(rs.getLong("friend_id"));

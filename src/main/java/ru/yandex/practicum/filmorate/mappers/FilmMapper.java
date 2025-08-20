@@ -46,7 +46,7 @@ public class FilmMapper {
                     .toList()));
         if (!filmRequest.getDirectors().isEmpty())
             film.setDirectors(new HashSet<Director>(filmRequest.getDirectors().stream()
-                    .map( DirectorMapper::mapShortToDirector)
+                    .map(DirectorMapper::mapShortToDirector)
                     .toList()));
 
         return film;

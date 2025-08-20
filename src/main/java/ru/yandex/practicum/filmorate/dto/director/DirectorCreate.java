@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dto.director;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
 
 @Builder
 @Data

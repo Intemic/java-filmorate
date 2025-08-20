@@ -163,7 +163,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 "                                                AND user_id = " + friendId + ")";
         List<Film> userFilms = jdbc.query(sqlRequest, filmExtractor);
         return userFilms.stream()
-                .sorted( (film1, film2) -> film2.getUserLiked().size() - film1.getUserLiked().size())
+                .sorted((film1, film2) -> film2.getUserLiked().size() - film1.getUserLiked().size())
                 .toList();
     }
 

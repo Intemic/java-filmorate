@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.dto.director.DirectorShort;
 import ru.yandex.practicum.filmorate.dto.genre.GenreShort;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaShort;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -17,7 +16,7 @@ import java.util.Set;
 
 @Slf4j
 @Data
-public class FilmUpdate{
+public class FilmUpdate {
     @NotNull
     private Long id;
     private String name;

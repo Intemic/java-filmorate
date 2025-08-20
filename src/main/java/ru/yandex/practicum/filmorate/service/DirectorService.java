@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.dto.director.DirectorDTO;
 import ru.yandex.practicum.filmorate.dto.director.DirectorUpdate;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
 import ru.yandex.practicum.filmorate.mappers.DirectorMapper;
-import ru.yandex.practicum.filmorate.mappers.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
