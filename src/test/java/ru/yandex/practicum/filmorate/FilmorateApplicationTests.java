@@ -7,13 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.user.UserCreate;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.mappers.FilmExtractor;
 import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.UserExtractor;
 import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -28,7 +30,8 @@ import java.util.Random;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, UserRowMapper.class, FilmDbStorage.class, FilmRowMapper.class})
+@Import({UserDbStorage.class, UserRowMapper.class, FilmDbStorage.class, FilmRowMapper.class,
+        FilmExtractor.class, UserExtractor.class})
 //@SpringBootTest
 class FilmorateApplicationTests {
     private final UserDbStorage userStorage;
@@ -86,7 +89,7 @@ class FilmorateApplicationTests {
 
     @Test
     public void testValidationCreateFilm() {
-        NewFilmRequest filmRequest = new NewFilmRequest(LocalDate.of(1800, 01, 01), 100);
+        FilmCreate filmRequest = new FilmCreate(LocalDate.of(1800, 01, 01), 100);
         ValidationException except = assertThrows(ValidationException.class,
                 filmRequest::checkCorrectData);
         assertEquals("Дата не может быть ранее 28 декабря 1895 года", except.getMessage());
