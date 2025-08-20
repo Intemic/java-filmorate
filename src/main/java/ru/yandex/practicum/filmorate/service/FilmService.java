@@ -16,13 +16,15 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.utill.Operation;
 
+import static ru.yandex.practicum.filmorate.utill.EventType.LIKE;
 import static ru.yandex.practicum.filmorate.utill.Operation.ADD;
-import static ru.yandex.practicum.filmorate.utill.Operation.DELETE;
+import static ru.yandex.practicum.filmorate.utill.Operation.REMOVE;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,18 +37,21 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final DirectorStorage directorStorage;
+    private final FeedStorage feedStorage;
 
     @Autowired
     public FilmService(@Qualifier("DBFilm") FilmStorage filmStorage,
                        UserService userService,
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage,
-                       DirectorStorage directorStorage) {
+                       DirectorStorage directorStorage,
+                       FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.userService = userService;
         this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
         this.directorStorage = directorStorage;
+        this.feedStorage = feedStorage;
     }
 
     public List<FilmDTO> getAll() {
@@ -112,10 +117,17 @@ public class FilmService {
                 if (!userLiked.contains(user.getId()))
                     filmStorage.addUserLiked(film.getId(), user.getId());
                 break;
-            case DELETE:
+            case REMOVE:
                 filmStorage.deleteUserLiked(film.getId(), user.getId());
                 break;
+            default:
+                return;
         }
+
+        feedStorage.insert(userId,
+                LIKE,
+                operation,
+                film.getId());
     }
 
     public void likeTheMove(Long filmId, Long userId) {
@@ -123,7 +135,7 @@ public class FilmService {
     }
 
     public void deleteLikeTheMove(Long filmId, Long userId) {
-        changeLikeTheMove(filmId, userId, DELETE);
+        changeLikeTheMove(filmId, userId, REMOVE);
     }
 
     public List<FilmDTO> getPopularFilms(int showCount, Long genreId, Integer year) {

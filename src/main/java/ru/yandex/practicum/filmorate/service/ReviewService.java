@@ -8,7 +8,11 @@ import ru.yandex.practicum.filmorate.dto.review.ReviewUpdate;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
 import ru.yandex.practicum.filmorate.mappers.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
+
+import static ru.yandex.practicum.filmorate.utill.EventType.*;
+import static ru.yandex.practicum.filmorate.utill.Operation.*;
 
 import java.util.List;
 
@@ -21,6 +25,7 @@ public class ReviewService {
     private final UserService userService;
     private final FilmService filmService;
     private final ReviewStorage reviewStorage;
+    private final FeedStorage feedStorage;
 
     public ReviewDTO getOneReview(Long id) {
         return ReviewMapper.mapToReviewDTO(
@@ -38,11 +43,20 @@ public class ReviewService {
         // проверки
         userService.getUser(newReview.getUserId());
         filmService.getFilm(newReview.getFilmId());
-        return ReviewMapper.mapToReviewDTO(reviewStorage.create(ReviewMapper.mapToReview(newReview)));
+        Review review = reviewStorage.create(ReviewMapper.mapToReview(newReview));
+        feedStorage.insert(newReview.getUserId(),
+                REVIEW,
+                ADD,
+                review.getId());
+        return ReviewMapper.mapToReviewDTO(review);
     }
 
     public void delete(Long id) {
         reviewStorage.get(id).orElseThrow(() -> new NotFoundResource("Отзыв не найден"));
+        feedStorage.insert(reviewStorage.get(id).get().getUser(),
+                REVIEW,
+                REMOVE,
+                id);
         reviewStorage.delete(id);
     }
 
@@ -82,7 +96,12 @@ public class ReviewService {
         // проверки
         filmService.getFilm(review.getFilm());
         userService.getUser(review.getUser());
-        return ReviewMapper.mapToReviewDTO(reviewStorage.update(review));
+        Review updated = reviewStorage.update(review);
+        feedStorage.insert(updated.getUser(),
+                REVIEW,
+                UPDATE,
+                updated.getId());
+        return ReviewMapper.mapToReviewDTO(reviewStorage.update(updated));
     }
 
 }

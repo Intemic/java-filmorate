@@ -83,3 +83,13 @@ CREATE TABLE IF NOT EXISTS films_director (
     FOREIGN KEY (director_id) REFERENCES directors(id) ON DELETE CASCADE,
     CONSTRAINT unique_keys_films_director UNIQUE(film_id, director_id)
 );
+
+CREATE TABLE IF NOT EXISTS feeds (
+    id IDENTITY NOT NULL PRIMARY KEY,
+    time_stamp TIMESTAMP,
+    user_id BIGINT,
+    event_type VARCHAR,
+    operation VARCHAR,
+    entity_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

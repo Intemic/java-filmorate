@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.UserExtractor;
@@ -84,6 +85,11 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         delete(DELETE_FRIEND,
                 userId,
                 friendId);
+    }
+
+    @Override
+    public List<Feed> getFeeds(Long userId) {
+        return List.of();
     }
 
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.feed.FeedDTO;
 import ru.yandex.practicum.filmorate.dto.user.UserCreate;
 import ru.yandex.practicum.filmorate.dto.user.UserUpdate;
 import ru.yandex.practicum.filmorate.dto.user.UserDTO;
@@ -29,6 +30,11 @@ public class UserController {
     @GetMapping("/{id}")
     public UserDTO getUser(@PathVariable @Positive Long id) {
         return userService.getUser(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<FeedDTO> getFeeds(@PathVariable @Positive Long id) {
+        return userService.getFeeds(id);
     }
 
     @GetMapping("/{id}/friends")

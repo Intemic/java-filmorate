@@ -3,17 +3,21 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.feed.FeedDTO;
 import ru.yandex.practicum.filmorate.dto.user.UserCreate;
 import ru.yandex.practicum.filmorate.dto.user.UserUpdate;
 import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.exeption.NotFoundResource;
+import ru.yandex.practicum.filmorate.mappers.FeedMapper;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.feed.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utill.Operation;
 
 import static ru.yandex.practicum.filmorate.utill.Operation.ADD;
-import static ru.yandex.practicum.filmorate.utill.Operation.DELETE;
+import static ru.yandex.practicum.filmorate.utill.Operation.REMOVE;
+import static ru.yandex.practicum.filmorate.utill.EventType.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,9 +26,12 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private final FeedStorage feedStorage;
 
-    public UserService(@Qualifier("DBUser") UserStorage userStorage) {
+    public UserService(@Qualifier("DBUser") UserStorage userStorage,
+                       FeedStorage feedStorage) {
         this.userStorage = userStorage;
+        this.feedStorage = feedStorage;
     }
 
     public List<UserDTO> getAll() {
@@ -76,10 +83,17 @@ public class UserService {
                 if (!listFriends.contains(friendId))
                     userStorage.addFriend(userId, friendId);
                 break;
-            case DELETE:
+            case REMOVE:
                 userStorage.deleteFriend(userId, friendId);
                 break;
+            default:
+                return;
         }
+
+        feedStorage.insert(userId,
+                FRIEND,
+                operation,
+                friendId);
     }
 
     public void addFriend(Long userId, Long friendId) {
@@ -87,7 +101,7 @@ public class UserService {
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        changeUserFriend(userId, friendId, DELETE);
+        changeUserFriend(userId, friendId, REMOVE);
     }
 
     public List<User> getFriends(Long id) {
@@ -114,5 +128,12 @@ public class UserService {
     public void deleteUser(Long userId) {
         getOneUser(userId);
         userStorage.delete(userId);
+    }
+
+    public List<FeedDTO> getFeeds(Long id) {
+        getOneUser(id);
+        return feedStorage.getFeeds(id).stream()
+                .map(feed -> FeedMapper.mapToFeedDTO(feed))
+                .toList();
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
 import ru.yandex.practicum.filmorate.dto.film.FilmCreate;
 import ru.yandex.practicum.filmorate.dto.film.FilmUpdate;
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class FilmMapper {
     public static FilmDTO mapToFilmDTO(Film film) {
         FilmDTO filmDTO = new FilmDTO();
